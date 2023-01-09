@@ -1,28 +1,13 @@
-#include <windows.h>
+#include <windows.h> //использует системные библиотеки такчто хрен его знает чем их заменить на линукс
 #include <WinUser.h>
 #include <locale.h>
 
-void Clipboard(char str[], int length)
-{
-    HGLOBAL h = GlobalAlloc(GMEM_MOVEABLE, length * sizeof(CHAR*));
-    LPVOID gl = GlobalLock(h);
- 
-    memcpy(gl, str, length * sizeof(CHAR*));
- 
-    GlobalUnlock(gl);
- 
-    OpenClipboard(NULL); // hWnd is set to NULL
-    EmptyClipboard(); // Sets clipboard ownership to someone don't know
-    SetClipboardData(CF_TEXT, h);  // Successfully data to clipboard!
-    CloseClipboard();
-}
 
-void ctrl_v_enter()
+void ctrl_v_enter() // сама симуляция нажатий. 
 {
     INPUT enter;
     INPUT ctrl_v[2];
 
-    // Pause for 5 seconds.
 
     // Set up a generic keyboard event.
     enter.type = INPUT_KEYBOARD;
@@ -36,7 +21,7 @@ void ctrl_v_enter()
     ctrl_v[0].ki.wScan = 0; // hardware scan code for key
     ctrl_v[0].ki.time = 0;
     ctrl_v[0].ki.dwExtraInfo = 0;
-    ctrl_v[0].ki.wVk = VK_CONTROL; // virtual-key code for the "a" key
+    ctrl_v[0].ki.wVk = VK_CONTROL; // virtual-key code for the smth key
     ctrl_v[0].ki.dwFlags = 0; // 0 for key press
 
     ctrl_v[1].type = INPUT_KEYBOARD;
@@ -48,7 +33,7 @@ void ctrl_v_enter()
 
     SendInput(2, ctrl_v, sizeof(INPUT));
     
-    // Release the "A" key
+    // Release the  key
     ctrl_v[0].ki.dwFlags = KEYEVENTF_KEYUP; // KEYEVENTF_KEYUP for key release
     ctrl_v[1].ki.dwFlags = KEYEVENTF_KEYUP;
     SendInput(2, ctrl_v, sizeof(INPUT));
@@ -56,13 +41,10 @@ void ctrl_v_enter()
     SendInput(1, &enter, sizeof(INPUT));
     enter.ki.dwFlags = KEYEVENTF_KEYUP;
     SendInput(1, &enter, sizeof(INPUT));
-    //enter.ki.dwFlags = 0;
-    //SendInput(1, &enter, sizeof(INPUT));
-    //enter.ki.dwFlags = KEYEVENTF_KEYUP;
-    //SendInput(1, &enter, sizeof(INPUT));
+
 }
 
-void clibord(const char* text, int length)
+void clibord(const char* text, int length) //функция загрузки в буфер обмена со стековерфлоу
 {
     if(OpenClipboard(0))//открываем буфер обмена
         {
@@ -78,7 +60,7 @@ void clibord(const char* text, int length)
         }
 }
 
-int main()
+int main()  //тут надо еще мучаться с задержкой и 6 сообщениями в очереди чтоб он не вставлял все в одно сообщение
 {
     
 
